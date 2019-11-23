@@ -606,6 +606,11 @@
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\timer.c</FilePath>
             </File>
+            <File>
+              <FileName>ESP8266.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\ESP8266.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
