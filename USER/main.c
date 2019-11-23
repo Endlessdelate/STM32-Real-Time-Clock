@@ -1,20 +1,41 @@
-#include "stm32f10x.h"
-#include "lcd.h"
-#include "led.h"
-#include "delay.h"
 #include "sys.h"
-#include "RTC.h"
-#include "usart.h"
+#include "delay.h"
+#include "usart.h" 
+#include "led.h" 		 	 
+#include "lcd.h"      
+#include "malloc.h"
+#include "sdio_sdcard.h"  
+#include "w25qxx.h"    
+#include "ff.h"  
+#include "exfuns.h"   
+#include "text.h"			
+#include "usart3.h"
+#include "cJSON.h" 
+#include "rtc.h"
 
-int main()
+void system_Init()
 {
-    unsigned char t = 0;
     delay_init();
     NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
     uart_init(115200);	 	//串口初始化为115200
     LED_Init();
     LCD_Init();
     RTC_Init();
+    W25QXX_Init();				//初始化W25Q128
+	//tp_dev.init();				//初始化触摸屏
+	usart3_init(115200);		//初始化串口3 
+ 	my_mem_init(SRAMIN);		//初始化内部内存池
+	exfuns_init();				//为fatfs相关变量申请内存  
+ 	f_mount(fs[0],"0:",1); 		//挂载SD卡 
+ 	f_mount(fs[1],"1:",1); 		//挂载FLASH.
+    font_init();			//检查字库是否OK      
+}
+
+
+int main()
+{
+    unsigned char t = 0;
+    system_Init();
     POINT_COLOR = BLACK;
     LCD_ShowString(60,130,200,32,24,"    -  -  ");
     LCD_ShowString(60,190,200,32,24,"  :  :  ");
