@@ -1,24 +1,9 @@
-#include "sys.h"
-#include "delay.h"
-#include "usart.h" 
-#include "led.h" 		 	 
-#include "lcd.h"      
-#include "malloc.h"
-#include "sdio_sdcard.h"  
-#include "w25qxx.h"    
-#include "ff.h"  
-#include "exfuns.h"   
-#include "text.h"			
-#include "usart3.h"
-#include "cJSON.h" 
-#include "rtc.h"
-#include "ESP8266.h"
+#include "include.h"
 
 
 void Show_RTC_time(void);
 void system_Init(void);
-
-
+void Reflash_Wather(void);
 
 int main()
 {
@@ -27,7 +12,7 @@ int main()
     
     while(1)
     {
-        Show_RTC_time();			
+        Show_RTC_time();
     }
 }
 
@@ -48,15 +33,17 @@ void system_Init()
  	f_mount(fs[0],"0:",1); 		//π“‘ÿSDø® 
  	f_mount(fs[1],"1:",1); 		//π“‘ÿFLASH.
     font_init();			    //ºÏ≤È◊÷ø‚ «∑ÒOK      
-    //ESP_8266_wifista_config();
     
     LCD_ShowString(0,0,10*8,16,16,"0000-00-00");
     LCD_ShowString(120,0,8*12,24,24,"00:00:00");
+    
+    ESP_8266_wifista_config();
 }
 
 void Show_RTC_time(void)
 {
-    static unsigned char t = 0;
+    static unsigned char t= 0;
+    static unsigned int count = 0;
     if(t!=calendar.sec)
     {
         t=calendar.sec;
@@ -91,5 +78,20 @@ void Show_RTC_time(void)
         LCD_ShowxNum(156,0,calendar.min,2,24,0x80);									  
         LCD_ShowxNum(192,0,calendar.sec,2,24,0x80);
         LED0=!LED0;
-	}		
+        count++;
+        if(count%31==0)
+        {
+            LED1=!LED1;
+            //delay_ms(100);
+            Reflash_Wather();
+            LED1=!LED1;
+        }
+        if(count==3600)
+        {
+            LED1=!LED1;
+            delay_ms(100);//Reflash_Timer()
+            LED1=!LED1;
+        }
+    }
+    
 }
