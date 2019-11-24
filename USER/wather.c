@@ -7,12 +7,13 @@
 
 u8 wather_data[700];
 uint8_t get_current_weather(void);
+uint8_t Analyse_Show_Wather_Data(void);
 
 void Reflash_Wather()
 {
     get_current_weather();
+    Analyse_Show_Wather_Data();
 }
-
 
 uint8_t get_current_weather(void)
 {
@@ -52,4 +53,22 @@ uint8_t get_current_weather(void)
     
 	myfree(SRAMIN,p);
 	return 0;
+}
+uint8_t Analyse_Show_Wather_Data(void)
+{
+    cJSON* wather_pocket = cJSON_Parse((char*)wather_data);
+    cJSON *wather_result = cJSON_GetObjectItem(wather_pocket,"result"); 
+    char* current_wather;
+    int temperature;
+    int  UTC_Time;
+    if(wather_pocket==NULL){printf("json pack into cjson error...\r\n");return 1;}
+    else printf("json pack into cjson success...\r\n");
+    //cJSON_Print(wather);
+    current_wather = cJSON_GetObjectItem(wather_result,"skycon")->valuestring;
+    temperature    = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
+    UTC_Time = cJSON_GetObjectItem(wather_pocket,"server_time")->valueint;
+    printf("current_wather:%s\r\ntemperature:%d\r\n",current_wather,temperature);
+    printf("UTC_Time:%d",UTC_Time);
+    cJSON_Delete(wather_pocket);
+    return 0;
 }
