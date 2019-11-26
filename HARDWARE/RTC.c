@@ -250,7 +250,14 @@ unsigned char RTC_Get_Week(unsigned short int year,unsigned char month,unsigned 
 	return(temp2%7);
 }
 
-
+void Set_RTC_with_UTC_time(unsigned int UTC_time)
+{
+    unsigned int seccount = UTC_time+28800;
+    RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR|RCC_APB1Periph_BKP,ENABLE);
+    PWR_BackupAccessCmd(ENABLE);
+    RTC_SetCounter(seccount);
+    RTC_WaitForLastTask();
+}
 
 
 

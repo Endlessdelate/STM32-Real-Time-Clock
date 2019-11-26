@@ -4,6 +4,28 @@
 #define WEATHER_PORTNUM 	"80"
 //https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.254881,35.214507/realtime.json?lang=en_US
 //https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.254881,35.214507/weather?lang=en_US
+//                             河南理工大学：   113.274063,35.193959
+
+unsigned int  UTC_Time;
+typedef struct
+{
+    char temperature;//温度
+    float pres;//气压(Pa)
+    float humidity;//相对湿度(%)
+    uint16_t wind_direction;//风向
+    float  wind_speed;//风速
+    float intensity;//雷达降水强度
+    uint8_t visibility;//能见度
+    char *skycon;//天气现象
+    uint16_t aqi;
+    uint16_t pm25;
+    uint16_t pm10;
+    uint16_t o3;
+    uint16_t so2;
+    uint16_t no2;
+    uint16_t co;
+}Wather;
+Wather weather;
 
 u8 wather_data[700];
 uint8_t get_current_weather(void);
@@ -35,7 +57,7 @@ uint8_t get_current_weather(void)
 	USART3_RX_STA=0;
 	ESP_8266_send_cmd("AT+CIPSEND","OK",100);         //开始透传
 	printf("start trans...\r\n");
-	u3_printf("GET https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.254881,35.214507/realtime.json?lang=en_US\n\n");	
+	u3_printf("GET https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.274063,35.193959/realtime.json?lang=en_US\n\n");	
 	delay_ms(20);//延时20ms返回的是指令发送成功的状态
 //	ESP_8266_at_response(1);
 	USART3_RX_STA=0;	//清零串口3数据
@@ -56,19 +78,24 @@ uint8_t get_current_weather(void)
 }
 uint8_t Analyse_Show_Wather_Data(void)
 {
+    static unsigned char count = 0;
     cJSON* wather_pocket = cJSON_Parse((char*)wather_data);
     cJSON *wather_result = cJSON_GetObjectItem(wather_pocket,"result"); 
-    char* current_wather;
-    int temperature;
-    int  UTC_Time;
     if(wather_pocket==NULL){printf("json pack into cjson error...\r\n");return 1;}
     else printf("json pack into cjson success...\r\n");
     //cJSON_Print(wather);
-    current_wather = cJSON_GetObjectItem(wather_result,"skycon")->valuestring;
-    temperature    = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
+    weather.skycon      = cJSON_GetObjectItem(wather_result,"skycon")->valuestring;
+    weather.temperature = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
     UTC_Time = cJSON_GetObjectItem(wather_pocket,"server_time")->valueint;
-    printf("current_wather:%s\r\ntemperature:%d\r\n",current_wather,temperature);
+    //printf("current_wather:%s\r\ntemperature:%d\r\n",current_wather,temperature);
     printf("UTC_Time:%d",UTC_Time);
+    if(count==0)
+    {
+        Set_RTC_with_UTC_time(UTC_Time+3);
+        count++;
+    }
+    else if(count==2)count = 0;
+    else count++;
     cJSON_Delete(wather_pocket);
     return 0;
 }

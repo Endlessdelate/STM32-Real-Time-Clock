@@ -8,8 +8,6 @@ void Reflash_Wather(void);
 int main()
 {
     system_Init();
-    POINT_COLOR = BLACK;
-    
     while(1)
     {
         Show_RTC_time();
@@ -24,6 +22,7 @@ void system_Init()
     uart_init(115200);	 	    //串口初始化为115200
     LED_Init();
     LCD_Init();
+    POINT_COLOR = BLACK;
     RTC_Init();
     W25QXX_Init();				//初始化W25Q128
 	//tp_dev.init();			//初始化触摸屏
@@ -38,6 +37,11 @@ void system_Init()
     LCD_ShowString(120,0,8*12,24,24,"00:00:00");
     
     ESP_8266_wifista_config();
+    delay_ms(1000);
+    delay_ms(1000);
+    delay_ms(1000);
+    delay_ms(1000);
+    Reflash_Wather();
 }
 
 void Show_RTC_time(void)
@@ -79,19 +83,12 @@ void Show_RTC_time(void)
         LCD_ShowxNum(192,0,calendar.sec,2,24,0x80);
         LED0=!LED0;
         count++;
-        if(count%31==0)
+        if((calendar.min==30)&&(calendar.sec==0))
         {
             LED1=!LED1;
             //delay_ms(100);
             Reflash_Wather();
             LED1=!LED1;
         }
-        if(count==3600)
-        {
-            LED1=!LED1;
-            delay_ms(100);//Reflash_Timer()
-            LED1=!LED1;
-        }
     }
-    
 }

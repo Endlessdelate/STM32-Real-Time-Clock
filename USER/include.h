@@ -18,7 +18,7 @@
 #include "rtc.h"
 #include "ESP8266.h"
 
-
+extern unsigned int  UTC_Time;
 
 #endif
 

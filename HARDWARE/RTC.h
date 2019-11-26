@@ -22,5 +22,7 @@ unsigned char RTC_Set(unsigned int syear,unsigned char smon,unsigned char sday,u
 unsigned char RTC_Alarm_Set(unsigned int syear,unsigned char smon,unsigned char sday,unsigned char hour,unsigned char min,unsigned char sec);
 unsigned char RTC_Get(void);
 unsigned char RTC_Get_Week(unsigned short int year,unsigned char month,unsigned char day);
+void Set_RTC_with_UTC_time(unsigned int UTC_time);
+
 
 #endif
