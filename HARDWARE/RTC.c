@@ -1,8 +1,4 @@
-#include "RTC.h"
-#include "sys.h"
-#include "delay.h"
-#include "usart.h"	  
-
+#include "include.h"
 
 _calendar_obj calendar;//时间结构体
 
@@ -80,7 +76,10 @@ unsigned char RTC_Init(void)
 void RTC_IRQHandler(void)
 {
     if(RTC_GetFlagStatus(RTC_IT_SEC) == SET)//秒钟中断
+    {
         RTC_Get();
+        Show_RTC_time();
+    }
     if(RTC_GetFlagStatus(RTC_IT_ALR) == SET)//闹钟中断
     {
         RTC_ClearITPendingBit(RTC_IT_ALR);
@@ -89,7 +88,6 @@ void RTC_IRQHandler(void)
     }
     RTC_ClearITPendingBit(RTC_IT_SEC|RTC_IT_OW);
     RTC_WaitForLastTask();
-
 }
 
 /****************************************************

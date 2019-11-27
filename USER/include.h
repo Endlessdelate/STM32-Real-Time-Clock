@@ -17,8 +17,14 @@
 #include "cJSON.h" 
 #include "rtc.h"
 #include "ESP8266.h"
-
+#include "timer.h"
 extern unsigned int  UTC_Time;
+
+
+
+
+
+void Show_RTC_time(void);
 
 #endif
 

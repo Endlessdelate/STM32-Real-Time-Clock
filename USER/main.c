@@ -10,7 +10,13 @@ int main()
     system_Init();
     while(1)
     {
-        Show_RTC_time();
+        if((calendar.min==30)||(calendar.sec==0))
+        {
+            LED1=!LED1;
+            Reflash_Wather();
+            LED1=!LED1;
+        }
+        delay_ms(100);
     }
 }
 
@@ -32,7 +38,7 @@ void system_Init()
  	f_mount(fs[0],"0:",1); 		//π“‘ÿSDø® 
  	f_mount(fs[1],"1:",1); 		//π“‘ÿFLASH.
     font_init();			    //ºÏ≤È◊÷ø‚ «∑ÒOK      
-    
+    //TIM4_Int_Init(65536,36000);
     LCD_ShowString(0,0,10*8,16,16,"0000-00-00");
     LCD_ShowString(120,0,8*12,24,24,"00:00:00");
     
@@ -44,13 +50,13 @@ void system_Init()
     Reflash_Wather();
 }
 
-void Show_RTC_time(void)
+void Show_RTC_time(void)//RTC√Î÷–∂œµ˜”√
 {
-    static unsigned char t= 0;
-    static unsigned int count = 0;
-    if(t!=calendar.sec)
-    {
-        t=calendar.sec;
+    //static unsigned char t= 0;
+    //static unsigned int count = 0;
+    //if(t!=calendar.sec)
+    //{
+    //    t=calendar.sec;
         LCD_ShowxNum(0,0,calendar.year,4,16,0x80);									  
         LCD_ShowxNum(40,0,calendar.month,2,16,0x80);									  
         LCD_ShowxNum(64,0,calendar.date,2,16,0x80);	 
@@ -82,13 +88,5 @@ void Show_RTC_time(void)
         LCD_ShowxNum(156,0,calendar.min,2,24,0x80);									  
         LCD_ShowxNum(192,0,calendar.sec,2,24,0x80);
         LED0=!LED0;
-        count++;
-        if((calendar.min==30)&&(calendar.sec==0))
-        {
-            LED1=!LED1;
-            //delay_ms(100);
-            Reflash_Wather();
-            LED1=!LED1;
-        }
-    }
+    //}
 }

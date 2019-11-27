@@ -15,4 +15,6 @@
 ////////////////////////////////////////////////////////////////////////////////// 	
 
 void TIM7_Int_Init(u16 arr,u16 psc);
+void TIM4_Int_Init(unsigned int arr,unsigned int psc);
+
 #endif

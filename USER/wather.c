@@ -57,8 +57,10 @@ uint8_t get_current_weather(void)
 	USART3_RX_STA=0;
 	ESP_8266_send_cmd("AT+CIPSEND","OK",100);         //开始透传
 	printf("start trans...\r\n");
+    //TIM_Cmd(TIM4,ENABLE);
 	u3_printf("GET https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.274063,35.193959/realtime.json?lang=en_US\n\n");	
-	delay_ms(20);//延时20ms返回的是指令发送成功的状态
+    //TIM4 -> CNT = 0;
+    delay_ms(20);//延时20ms返回的是指令发送成功的状态
 //	ESP_8266_at_response(1);
 	USART3_RX_STA=0;	//清零串口3数据
 	delay_ms(1000);
@@ -79,23 +81,35 @@ uint8_t get_current_weather(void)
 uint8_t Analyse_Show_Wather_Data(void)
 {
     static unsigned char count = 0;
+    uint32_t wlyc;
     cJSON* wather_pocket = cJSON_Parse((char*)wather_data);
-    cJSON *wather_result = cJSON_GetObjectItem(wather_pocket,"result"); 
+    cJSON* wather_result; 
     if(wather_pocket==NULL){printf("json pack into cjson error...\r\n");return 1;}
     else printf("json pack into cjson success...\r\n");
     //cJSON_Print(wather);
-    weather.skycon      = cJSON_GetObjectItem(wather_result,"skycon")->valuestring;
-    weather.temperature = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
-    UTC_Time = cJSON_GetObjectItem(wather_pocket,"server_time")->valueint;
-    //printf("current_wather:%s\r\ntemperature:%d\r\n",current_wather,temperature);
-    printf("UTC_Time:%d",UTC_Time);
-    if(count==0)
+    if(strcmp(cJSON_GetObjectItem(wather_pocket,"status")->valuestring,"failed")==0)
     {
-        Set_RTC_with_UTC_time(UTC_Time+3);
-        count++;
+        printf("Error:%s",cJSON_GetObjectItem(wather_pocket,"error")->valuestring);
     }
-    else if(count==2)count = 0;
-    else count++;
+    else
+    {
+        wather_result = cJSON_GetObjectItem(wather_pocket,"result");
+        //weather.skycon      = cJSON_GetObjectItem(wather_result,"skycon")->valuestring;
+        //weather.temperature = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
+        UTC_Time = cJSON_GetObjectItem(wather_pocket,"server_time")->valueint;
+        //printf("current_wather:%s\r\ntemperature:%d\r\n",weather.skycon,weather.temperature);
+        printf("UTC_Time:%d",UTC_Time);
+        if(count==0)
+        {
+            //wlyc = TIM4->CNT;
+            Set_RTC_with_UTC_time(UTC_Time+3);
+            TIM_Cmd(TIM4,DISABLE);
+            count++;
+        }
+        else if(count==2)count = 0;
+        else count++;
+    }
     cJSON_Delete(wather_pocket);
+    cJSON_Delete(wather_result);
     return 0;
 }
