@@ -5,16 +5,19 @@ void Show_RTC_time(void);
 void system_Init(void);
 void Reflash_Wather(void);
 
+uint8_t reflashflag = 0;;
+
 int main()
 {
     system_Init();
     while(1)
     {
-        if((calendar.min==30)||(calendar.sec==0))
+        if(((calendar.min==30)&&(calendar.sec==0))||reflashflag==1)
         {
             LED1=!LED1;
             Reflash_Wather();
             LED1=!LED1;
+            reflashflag=0;
         }
         delay_ms(100);
     }
@@ -29,25 +32,27 @@ void system_Init()
     LED_Init();
     LCD_Init();
     POINT_COLOR = BLACK;
+    EXTIX_Init();
     RTC_Init();
     W25QXX_Init();				//初始化W25Q128
 	//tp_dev.init();			//初始化触摸屏
 	usart3_init(115200);		//初始化串口3 
  	my_mem_init(SRAMIN);		//初始化内部内存池
 	exfuns_init();				//为fatfs相关变量申请内存  
- 	f_mount(fs[0],"0:",1); 		//挂载SD卡 
+ 	//f_mount(fs[0],"0:",1); 		//挂载SD卡 
  	f_mount(fs[1],"1:",1); 		//挂载FLASH.
     font_init();			    //检查字库是否OK      
-    //TIM4_Int_Init(65536,36000);
+    //TIM4_Int_Init(65535,36000);
     LCD_ShowString(0,0,10*8,16,16,"0000-00-00");
     LCD_ShowString(120,0,8*12,24,24,"00:00:00");
-    
+    LCD_ShowString(0,300,22*8,16,16,"WIFI Connecting.......");
     ESP_8266_wifista_config();
     delay_ms(1000);
     delay_ms(1000);
     delay_ms(1000);
     delay_ms(1000);
     Reflash_Wather();
+    
 }
 
 void Show_RTC_time(void)//RTC秒中断调用

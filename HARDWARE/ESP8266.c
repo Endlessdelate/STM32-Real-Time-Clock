@@ -1,9 +1,9 @@
 #include "ESP8266.h"
 
 //WIFI STA模式,设置要去连接的路由器无线参数,请根据你自己的路由器设置,自行修改.
-const u8* wifista_ssid="1417-3";			//路由器SSID号
+const u8* wifista_ssid="1517";			//路由器SSID号
 const u8* wifista_encryption="wpawpa2_aes";	//wpa/wpa2 aes加密方式
-const u8* wifista_password="14171417"; 	//连接密码
+const u8* wifista_password="15171517"; 	//连接密码
 
 //5种加密方式
 const u8 *ESP_ESP8266_ECN_TBL[5]={"OPEN","WEP","WPA_PSK","WPA2_PSK","WPA_WAP2_PSK"};
@@ -152,6 +152,7 @@ u8 ESP_8266_wifista_config(void)
 		Show_Str(40,55,200,16,"未检测到模块!!!",16,0);
 		delay_ms(800);
 	} 
+    Show_Str(40,55,200,16,"                   ",16,0);
 	while(ESP_8266_send_cmd("ATE0","OK",20));//关闭回显
 	ESP_8266_send_cmd("AT+CWMODE=1","OK",50);		//设置WIFI STA模式
 	ESP_8266_send_cmd("AT+RST","OK",20);		//DHCP服务器关闭(仅AP模式有效) 
@@ -162,7 +163,7 @@ u8 ESP_8266_wifista_config(void)
 	//设置连接到的WIFI网络名称/加密方式/密码,这几个参数需要根据您自己的路由器设置进行修改!! 
 	ESP_8266_send_cmd("AT+CIPMUX=0","OK",20);   //0：单连接，1：多连接
 	sprintf((char*)p,"AT+CWJAP=\"%s\",\"%s\"",wifista_ssid,wifista_password);//设置无线参数:ssid,密码
-	while(ESP_8266_send_cmd(p,"WIFI GOT IP",300));					//连接目标路由器,并且获得IP
+	while(ESP_8266_send_cmd(p,"WIFI GOT IP",600));					//连接目标路由器,并且获得IP
 	
 	myfree(SRAMIN,p);
 	return 0;
