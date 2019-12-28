@@ -2,7 +2,7 @@
 
 #define WEATHER_SERVERIP 	"api.caiyunapp.com"
 #define WEATHER_PORTNUM 	"80"
-#define WEATHER_SERVERURL "GET https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.274063,35.193959/realtime.json?lang=en_US\r\n"
+#define WEATHER_SERVERURL "GET https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.274063,35.193959/realtime.json?lang=en_US&unit=metric:v2\r\n"
                              //https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.254881,35.214507/realtime.json?lang=en_US
                              //https://api.caiyunapp.com/v2/TAkhjf8d1nlSlspN/113.254881,35.214507/weather?lang=en_US
                              //                             河南理工大学：   113.274063,35.193959
@@ -90,7 +90,7 @@ uint8_t Analyse_Wather_Data(Wather *weather)
         strcpy(weather->skycon,cJSON_GetObjectItem(wather_result,"skycon")->valuestring);
         weather->temperature    = cJSON_GetObjectItem(wather_result,"temperature")->valueint;
         weather->humidity       = cJSON_GetObjectItem(wather_result,"humidity")->valuedouble;
-        weather->visibility     = cJSON_GetObjectItem(wather_result,"visibility")->valueint;
+        weather->visibility     = cJSON_GetObjectItem(wather_result,"visibility")->valuedouble;
         weather->aqi            = cJSON_GetObjectItem(wather_result,"aqi")->valueint;
         weather->pm25           = cJSON_GetObjectItem(wather_result,"pm25")->valueint;
         weather->pm10           = cJSON_GetObjectItem(wather_result,"pm10")->valueint;
@@ -115,8 +115,8 @@ uint8_t Analyse_Wather_Data(Wather *weather)
     cJSON_Delete(weather_precipitation_local);
     cJSON_Delete(weather_precipitation);
     cJSON_Delete(wather_result);
-    cJSON_Delete(wather_pocket);
-    
+    cJSON_Delete(wather_pocket);//释放内存有问题？？？
+    my_mem_init(SRAMIN);//暴力释放内存
     return 0;
 }
 void LCD_Show_wather(Wather const *weather)
@@ -148,8 +148,8 @@ void LCD_Show_wather(Wather const *weather)
         case 'P':Show_Str(5,96,lcddev.width,lcddev.height,"多云",16,0);break;
         case 'W':Show_Str(5,96,lcddev.width,lcddev.height,"大风",16,0);break;
         case 'H':Show_Str(5,96,lcddev.width,lcddev.height,"雾霾",16,0);break;
-        case 'R':Show_Str(13,96,lcddev.width,lcddev.height,"雨",16,0);break;
-        case 'S':Show_Str(13,96,lcddev.width,lcddev.height,"雪",16,0);break;
+        case 'R':Show_Str(21,96,lcddev.width,lcddev.height,"雨",16,0);break;
+        case 'S':Show_Str(21,96,lcddev.width,lcddev.height,"雪",16,0);break;
     }
     //Show_Str(13,96,lcddev.width,lcddev.height,"雪",16,0);break;
     sprintf((char*)string,"相对湿度：%.1f%%",weather->humidity*100);
@@ -159,19 +159,18 @@ void LCD_Show_wather(Wather const *weather)
     Show_Str(5,138,lcddev.width,lcddev.height,string,16,0);
     if(weather->intensity!=0)
     {
-    sprintf((char*)string,"降水：%.3f mm",weather->intensity);
+    sprintf((char*)string,"降水：%.3f mm/h",weather->intensity);
     Show_Str(5,154,lcddev.width,lcddev.height,string,16,0);
-        //雷达降水强度（0 ~ 1）判断降水等级：0.03~0.25 小雨(雪)， 0.25~0.35 中雨(雪)， 0.35~0.48大雨(雪)， >0.48 暴雨(雪)；
-        if((weather->intensity>=0.03)&&(weather->intensity<=0.25))
+        if((weather->intensity>=0.03)&&(weather->intensity<=2.5))
             Show_Str(5,96,lcddev.width,lcddev.height,"小",16,0);
-        else if((weather->intensity>0.25)&&(weather->intensity<=0.35))
+        else if((weather->intensity>2.5)&&(weather->intensity<=8))
             Show_Str(5,96,lcddev.width,lcddev.height,"中",16,0);
-        else if((weather->intensity>0.35)&&(weather->intensity<=0.48))
+        else if((weather->intensity>8)&&(weather->intensity<=15))
             Show_Str(5,96,lcddev.width,lcddev.height,"大",16,0);
-        else if(weather->intensity>0.48)
+        else if(weather->intensity>15)
             Show_Str(5,96,lcddev.width,lcddev.height,"暴",16,0);
     }
-    sprintf((char*)string,"能见度：% d Km",weather->visibility);
+    sprintf((char*)string,"能见度：%.2f Km",weather->visibility);
     Show_Str(5,170,lcddev.width,lcddev.height,string,16,0);
     
     sprintf((char*)string,"空气污染指数AQI：%d",(int)weather->aqi);
@@ -191,10 +190,4 @@ void LCD_Show_wather(Wather const *weather)
     Show_Str(20,250,lcddev.width,lcddev.height,string,16,0);
     sprintf((char*)string,"CO : %d",weather->co);
     Show_Str(140,250,lcddev.width,lcddev.height,string,16,0);
-    
-    
-    
-    
-    
-    
 }

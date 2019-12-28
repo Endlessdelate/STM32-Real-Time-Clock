@@ -31,7 +31,7 @@ typedef struct
     uint16_t wind_direction;//风向
     double  wind_speed;//风速
     double intensity;//雷达降水强度
-    uint8_t visibility;//能见度
+    double visibility;//能见度
     char skycon[20];//天气现象
     uint16_t aqi;
     uint16_t pm25;

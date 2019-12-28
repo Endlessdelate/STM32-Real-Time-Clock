@@ -1,9 +1,9 @@
 #include "ESP8266.h"
 
 //WIFI STA模式,设置要去连接的路由器无线参数,请根据你自己的路由器设置,自行修改.
-const u8* wifista_ssid="1517";			//路由器SSID号
+const u8* wifista_ssid="CMCC-No-net";			//路由器SSID号
 const u8* wifista_encryption="wpawpa2_aes";	//wpa/wpa2 aes加密方式
-const u8* wifista_password="15171517"; 	//连接密码
+const u8* wifista_password="1234567899"; 	//连接密码
 
 //5种加密方式
 const u8 *ESP_ESP8266_ECN_TBL[5]={"OPEN","WEP","WPA_PSK","WPA2_PSK","WPA_WAP2_PSK"};
